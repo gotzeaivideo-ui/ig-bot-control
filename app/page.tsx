@@ -12,6 +12,24 @@ export default function Home() {
   const [status, setStatus] = useState<Status>("unknown");
   const [message, setMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  
+const [installPrompt, setInstallPrompt] = useState<any>(null);
+
+useEffect(() => {
+  function handler(e: any) {
+    e.preventDefault();
+    setInstallPrompt(e);
+  }
+  window.addEventListener("beforeinstallprompt", handler);
+  return () => window.removeEventListener("beforeinstallprompt", handler);
+}, []);
+
+async function handleInstallClick() {
+  if (!installPrompt) return;
+  installPrompt.prompt();
+  await installPrompt.userChoice;
+  setInstallPrompt(null);
+}
 
   function handleChange(value: string) {
     setInput(value);
@@ -129,6 +147,15 @@ export default function Home() {
           Disable
         </button>
       </div>
+
+      {installPrompt && (
+        <button
+          onClick={handleInstallClick}
+          className="mt-4 rounded-xl bg-white px-6 py-3 text-sm font-medium text-black"
+        >
+          Install App
+        </button>
+      )}
     </main>
   );
 }
